@@ -15,17 +15,13 @@ def main():
     
     #whenever read from a file, split method above always creates newlines
     del assemblyCodeSplitByLine[-1]
-    print(assemblyCodeSplitByLine)
     
     assembleInstructions(assemblyCodeSplitByLine)
     
 def assembleInstructions(assemblyCode):
     
-    #make this parallel in future for performance
     for line in assemblyCode:
         instruction = line.split(" ")
-        operation = instruction[0]
-        print(operation)
         checkOperation(instruction)
     
 def checkOperation(instruction):
@@ -91,16 +87,12 @@ def checkOperation(instruction):
         binaryInstruction = div(instruction)
     
     else:
-        print(instruction[0] + " is not a valid operation")
-        binaryInstruction = None
+        binaryInstruction = instruction[0] + " is not a valid operation"
         
     print(binaryInstruction)
     return
 
-        
-#make all i instructions go to one function that checks the first arg, hashes the value of the first arg
-#and returns a tuple with 2 args. the first arg the binary instruction, the second arg a boolean saying if it is a 
-#shift function. If it is, then find binary shamt, else add 00000 for shamt
+#functions to handle individual instructions
 def add(instruction):
     #wrong format for add instruction
     if(len(instruction)!=4):
@@ -113,7 +105,7 @@ def add(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -138,7 +130,7 @@ def sub(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -162,7 +154,7 @@ def andFunc(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -177,7 +169,7 @@ def andFunc(instruction):
 def orFunc(instruction):
     #wrong format for or instruction
     if(len(instruction)!=4):
-        print("incorrect format for and instruction")
+        print("incorrect format for or instruction")
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -186,7 +178,7 @@ def orFunc(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -201,7 +193,7 @@ def orFunc(instruction):
 def xor(instruction):
     #wrong format for xor instruction
     if(len(instruction)!=4):
-        print("incorrect format for and instruction")
+        print("incorrect format for xor instruction")
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -210,7 +202,7 @@ def xor(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -225,7 +217,7 @@ def xor(instruction):
 def nor(instruction):
     #wrong format for nor instruction
     if(len(instruction)!=4):
-        print("incorrect format for and instruction")
+        print("incorrect format for nor instruction")
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -234,7 +226,7 @@ def nor(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -249,7 +241,7 @@ def nor(instruction):
 def slt(instruction):
     #wrong format for slt instruction
     if(len(instruction)!=4):
-        print("incorrect format for and instruction")
+        print("incorrect format for slt instruction")
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -258,7 +250,7 @@ def slt(instruction):
         
         #find and append register values
         regList = getRTypeRegisters(instruction)
-        #pass function of a function here
+        
         for reg in regList:
             binaryInstructionList.append(reg)
             
@@ -377,8 +369,10 @@ def j(instruction):
         #opcode
         binaryInstructionList.append('000010')
         
-        address = getJTypeAddress(instruction)
-        binaryInstructionList.append(address[0])
+        checkForNegativeAddressJump(instruction[1])
+        
+        #address = getJTypeAddress(instruction)
+        binaryInstructionList.append(getImmediateValue(instruction[1], 26))
         
         binaryInstruction = ''.join(binaryInstructionList)
         
@@ -393,12 +387,18 @@ def jal(instruction):
         #opcode
         binaryInstructionList.append('000011')
         
-        address = getJTypeAddress(instruction)
-        binaryInstructionList.append(address[0])
+        checkForNegativeAddressJump(instruction[1])
+        
+        #address = getJTypeAddress(instruction)
+        binaryInstructionList.append(getImmediateValue(instruction[1], 26))
         
         binaryInstruction = ''.join(binaryInstructionList)
         
     return binaryInstruction
+
+def checkForNegativeAddressJump(address):
+    if(int(address) < 0):
+        print("The instruction below requests a jump to a negative address")
 
 def lw(instruction):
     if(len(instruction)!=3):
@@ -596,7 +596,7 @@ def lui(instruction):
         #rt
         binaryInstructionList.append(getRegisterValue(instruction[1]))
         #shamt
-        binaryInstructionList.append(getImmediateValue(instruction[2]))
+        binaryInstructionList.append(getImmediateValue(instruction[2], 16))
 
         binaryInstruction = ''.join(binaryInstructionList)
     
@@ -683,7 +683,7 @@ def getITypeRegisters(instruction):
     #$rt
     registersList.append(getRegisterValue(instruction[1]))
     #imm
-    registersList.append(getImmediateValue(instruction[3]))
+    registersList.append(getImmediateValue(instruction[3], 16))
     
     return registersList
 
@@ -696,7 +696,7 @@ def getLoadAndStoreRegisters(instruction):
     #$rt
     registersList.append(getRegisterValue(instruction[1]))
     #imm
-    registersList.append(getImmediateValue(parsedLoadInstruction[0]))
+    registersList.append(getImmediateValue(parsedLoadInstruction[0], 16))
     
     return registersList
 
@@ -706,37 +706,17 @@ def parseLoadInstruction(instruction):
     instructionList[1] = instructionList[1].replace(")", "")
 
     return instructionList
-
-def getJTypeAddress(instruction):
-    valuesList = []
-    #$rs
-    valuesList.append(getAddressValue(instruction[1]))
-    return valuesList
     
 def getShiftInstructionValues(instruction):
     valuesList = []
     valuesList.append(getRegisterValue(instruction[2]))
     valuesList.append(getRegisterValue(instruction[1]))
+    
+    if(int(instruction[3])<0):
+        print("negative shift amount requested. Below instruction shamt incorrect")
     valuesList.append(getBinaryShiftValue(instruction[3]))
     
     return valuesList
-
-def getAddressValue(addr):
-    valueString = str(bin(int(addr))).replace('0b','')
-    intAddr = (int(addr))
-    #find a more efficient way to do this
-    #handle errors for numbers that don't fit in 16 bits
-    #handle negatives
-    if(intAddr<0):
-        print("less than 0")
-        while(len(valueString)<26):
-            valueString = '1' + valueString       
-    else:
-        print("0 or greater")
-        while(len(valueString)<26):
-            valueString = '0' + valueString
-    
-    return  valueString
     
     
 def getRegisterValue(reg):
@@ -812,80 +792,37 @@ def getRegisterValue(reg):
         
     return binaryReg
 
-def getImmediateValue(imm):
+def getImmediateValue(imm,numOfBits):
     
-    if(imm[0] == '0'):
-            if(imm[1] == 'b'):
-                print("BINARY STRING")#check for 1 and 0
-                return 'BINARYSTRING'
-            elif(imm[1] == 'x'):
-                print("HEX STRING")#check for 0-f
-                return 'HEXSTRING'
+    #num of bits is 16 for immediate instructions and 26 for jump instructions
+    intImm = (int(imm))
     
-    temp = int(imm)
-    if(temp < 0):
-        binint = int("{0:b}".format(temp))
-        flipped = ~binint
-        flipped += 1
-        intflipped = str(flipped)
-    else:
-        intflipped = str(1)
+    if(intImm > (2**numOfBits)-1):
+        print("Immediate value", imm, "too large for", numOfBits,"bits. Incorrect immediate value produced in below instruction.")
+    elif(intImm < -(2**numOfBits)):
+        print("Immediate value", imm, "too small for", numOfBits,"bits. Incorrect immediate value produced in below instruction.")
     
-    return intflipped
+    twos = lambda x, count=numOfBits: "".join(map(lambda y:str((x>>y)&1), range(count-1, -1, -1)))
     
- #   valueString = str(bin(int(imm))).replace('0b','')
- #   intImm = (int(imm))
-        #find a more efficient way to do this
-       #handle errors for numbers that don't fit in 16 bits
-       #handle negatives
-#    if(intImm<0):
-#        print("less than 0")
-  #      while(len(valueString)<16):
- #           valueString = '1' + valueString       
-#    else:
- #       print("0 or greater")
-   #     while(len(valueString)<16):
-  #          valueString = '0' + valueString
-    
-  #  return  valueString
+    return twos(intImm)
 
+#returns binary for shamt
 def getBinaryShiftValue(shift):
     valueString = str(bin(int(shift))).replace('0b','')
     intShift = (int(shift))
     
     if(intShift<0):
-        print("less than 0")
-        while(len(valueString)<5):
-            valueString = '1' + valueString       
+        print("shift value cannot be less than 0. Below shamt is incorrect")
+        return '00000'      
     else:
-        print("0 or greater")
+        if(intShift>31):
+            print("The shift amount is too large to be held in 5 bits. Shamt in below instruction incorrect")
+            return '00000'
         while(len(valueString)<5):
             valueString = '0' + valueString
     
     return  valueString
 
 
-    
 if __name__=="__main__":
     main()
-    
-    #def checkForErrors(lines):
- #  for line in lines:
-        #lines.lstrip(',')
-      #  emptyString = False
-       # print(len(line))
-        
-     #   if(len(line)==0):
-    #        emptyString=True
-    #    elif(len(line)==4):
-    #        operation, rd, rt, rs = line.split()
-     #       print("yo " + operation)
-        
-        
-        #ignores empty lists/lines
-      #  if(not emptyString):
-    #        print("yo " + operation)
-     #   else:
-      #      print("nothin")
-    #
-    
