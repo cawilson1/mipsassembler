@@ -1,8 +1,13 @@
+Label1:
+
+
+
+
 asdf
-j -15
+j Label2:
 jal 80000
-j -5
-j 99999999999999999
+j Label1:
+j Label1:
 sll $t5, $s5, 3
 srl $t5, $s5, 31
 srl $t5, $s5, 32
@@ -20,11 +25,12 @@ add $s0, $s0, $s0
 beq $s0, $t0, 511
 add $s0, $s0, $s0
 bne $s1, $t0, -5
-j 6
+j Label2:
 jal 7
 lw $s0, 8($s3)
 lb $s1, 8($s4)
 lh $s1, 8($s4)
+POOP:
 sw $t7, 12($t5)
 sb $t7, 12($t5)
 sh $t7, 12($t5)
@@ -32,6 +38,8 @@ bne $15, $15, 255
 bne $t7, $t7, 255
 add $0, $zero, $0
 slti $t5, $s7, 9
+Label2:
+Label3
 andi $a0, $a0, 15
 ori $s0, $a0, 255
 xori $s0, $a0, 255

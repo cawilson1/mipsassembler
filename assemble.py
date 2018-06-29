@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 25 22:04:03 2018
-
-@author: caseyubvm
-"""
 
 def main():
     with open(('assembly_program.asm'), "r") as f:
@@ -18,79 +13,104 @@ def main():
     
     assembleInstructions(assemblyCodeSplitByLine)
     
+#run through file twice, first time for labels, second time for rest
 def assembleInstructions(assemblyCode):
     
-    for line in assemblyCode:
-        instruction = line.split(" ")
-        checkOperation(instruction)
+    firstPassThrough = True
+    currentLine = 0
     
-def checkOperation(instruction):
+    i = 0
+    while(i < 2):
+        for line in assemblyCode:
+            if not line.strip() == '':#ignore blank lines
+                instruction = line.split(" ")
+                checkOperation(instruction, firstPassThrough, currentLine)
+                currentLine += 1
+        i += 1
+        firstPassThrough = False
+        currentLine = 0
+    
+def checkOperation(instruction, firstPassThrough, currentLine):
     #operation should always be first element in instruction
     
-    #make this into a dictionary later for performance
-    #check operations here
-    if instruction[0] == 'add':
-        binaryInstruction = add(instruction)
-    elif instruction[0] == 'sub':
-        binaryInstruction = sub(instruction)
-    elif instruction[0] == 'addi':
-        binaryInstruction = addi(instruction)
-    elif instruction[0] == 'and':
-        binaryInstruction = andFunc(instruction)
-    elif instruction[0] == 'or':
-        binaryInstruction = orFunc(instruction)
-    elif instruction[0] == 'xor':
-        binaryInstruction = xor(instruction)
-    elif instruction[0] == 'nor':
-        binaryInstruction = nor(instruction)
-    elif instruction[0] == 'beq':
-        binaryInstruction = beq(instruction)
-    elif instruction[0] == 'bne':
-        binaryInstruction = bne(instruction)
-    elif instruction[0] == 'j':
-        binaryInstruction = j(instruction)
-    elif instruction[0] == 'jal':
-        binaryInstruction = jal(instruction)
-    elif instruction[0] == 'sll':
-        binaryInstruction = sll(instruction)
-    elif instruction[0] == 'srl':
-        binaryInstruction = srl(instruction)
-    elif instruction[0] == 'lw':
-        binaryInstruction = lw(instruction)
-    elif instruction[0] == 'lb':
-        binaryInstruction = lb(instruction)
-    elif instruction[0] == 'lh':
-        binaryInstruction = lh(instruction)
-    elif instruction[0] == 'sw':
-        binaryInstruction = sw(instruction)
-    elif instruction[0] == 'sb':
-        binaryInstruction = sb(instruction)
-    elif instruction[0] == 'sh':
-        binaryInstruction = sh(instruction)
-    elif instruction[0] == 'syscall':
-        binaryInstruction = syscall(instruction)
-    elif instruction[0] == 'slti':
-        binaryInstruction = slti(instruction)
-    elif instruction[0] == 'andi':
-        binaryInstruction = andi(instruction)
-    elif instruction[0] == 'ori':
-        binaryInstruction = ori(instruction)
-    elif instruction[0] == 'xori':
-        binaryInstruction = xori(instruction)
-    elif instruction[0] == 'lui':
-        binaryInstruction = lui(instruction)
-    elif instruction[0] == 'jr':
-        binaryInstruction = jr(instruction)
-    elif instruction[0] == 'mult':
-        binaryInstruction = mult(instruction)
-    elif instruction[0] == 'div':
-        binaryInstruction = div(instruction)
-    
-    else:
-        binaryInstruction = instruction[0] + " is not a valid operation"
+    if not firstPassThrough:
+            #make this into a dictionary later for performance
+            #check operations here
+        if instruction[0] == 'add':
+            binaryInstruction = add(instruction)
+        elif instruction[0] == 'sub':
+            binaryInstruction = sub(instruction)
+        elif instruction[0] == 'addi':
+            binaryInstruction = addi(instruction)
+        elif instruction[0] == 'and':
+            binaryInstruction = andFunc(instruction)
+        elif instruction[0] == 'or':
+            binaryInstruction = orFunc(instruction)
+        elif instruction[0] == 'xor':
+            binaryInstruction = xor(instruction)
+        elif instruction[0] == 'nor':
+            binaryInstruction = nor(instruction)
+        elif instruction[0] == 'beq':
+            binaryInstruction = beq(instruction)
+        elif instruction[0] == 'bne':
+            binaryInstruction = bne(instruction)
+        elif instruction[0] == 'j':
+            binaryInstruction = j(instruction)
+        elif instruction[0] == 'jal':
+            binaryInstruction = jal(instruction)
+        elif instruction[0] == 'sll':
+            binaryInstruction = sll(instruction)
+        elif instruction[0] == 'srl':
+            binaryInstruction = srl(instruction)
+        elif instruction[0] == 'lw':
+            binaryInstruction = lw(instruction)
+        elif instruction[0] == 'lb':
+            binaryInstruction = lb(instruction)
+        elif instruction[0] == 'lh':
+            binaryInstruction = lh(instruction)
+        elif instruction[0] == 'sw':
+            binaryInstruction = sw(instruction)
+        elif instruction[0] == 'sb':
+            binaryInstruction = sb(instruction)
+        elif instruction[0] == 'sh':
+            binaryInstruction = sh(instruction)
+        elif instruction[0] == 'syscall':
+            binaryInstruction = syscall(instruction)
+        elif instruction[0] == 'slti':
+            binaryInstruction = slti(instruction)
+        elif instruction[0] == 'andi':
+            binaryInstruction = andi(instruction)
+        elif instruction[0] == 'ori':
+            binaryInstruction = ori(instruction)
+        elif instruction[0] == 'xori':
+            binaryInstruction = xori(instruction)
+        elif instruction[0] == 'lui':
+            binaryInstruction = lui(instruction)
+        elif instruction[0] == 'jr':
+            binaryInstruction = jr(instruction)
+        elif instruction[0] == 'mult':
+            binaryInstruction = mult(instruction)
+        elif instruction[0] == 'div':
+            binaryInstruction = div(instruction)
         
-    print(binaryInstruction)
-    return
+        else:
+            if firstPassThrough:
+                print("first pass through")
+                key = instruction[0]
+                
+                #proper syntax for a label
+                if key.endswith(':') and len(key)>1:
+                    Labels[key] = currentLine
+            else:
+                if not instruction[0] in Labels:
+                    binaryInstruction = instruction[0] + " is not a valid operation"
+                else:
+                    binaryInstruction = ''#ignore current line, it is a label. set binary instruction to print nothing
+            
+        #second part of and statement prevents printing of unecessary line
+        if not firstPassThrough and not binaryInstruction == '':
+            print(binaryInstruction)
+        return
 
 #functions to handle individual instructions
 def add(instruction):
@@ -369,10 +389,12 @@ def j(instruction):
         #opcode
         binaryInstructionList.append('000010')
         
-        checkForNegativeAddressJump(instruction[1])
+        binaryInstructionList.append(findLabelAddress(instruction[1]))
+        
+        #checkForNegativeAddressJump(instruction[1])
         
         #address = getJTypeAddress(instruction)
-        binaryInstructionList.append(getImmediateValue(instruction[1], 26))
+        #binaryInstructionList.append(getImmediateValue(instruction[1], 26))
         
         binaryInstruction = ''.join(binaryInstructionList)
         
@@ -823,6 +845,18 @@ def getBinaryShiftValue(shift):
     
     return  valueString
 
+def findLabelAddress(label):
+    labelAddress = Labels[label]
+    return getTwosComplement(labelAddress, 26)
+    
+def getTwosComplement(imm,numOfBits):
+    intImm = (int(imm))
+    twos = lambda x, count=numOfBits: "".join(map(lambda y:str((x>>y)&1), range(count-1, -1, -1)))
+    
+    return twos(intImm)
+
 
 if __name__=="__main__":
+    Labels = {}
     main()
+    print(Labels)
