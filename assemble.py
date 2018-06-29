@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 def main():
+    
     with open(('assembly_program.asm'), "r") as f:
             assemblyCode = f.read()
     f.closed
@@ -33,84 +34,112 @@ def assembleInstructions(assemblyCode):
 def checkOperation(instruction, firstPassThrough, currentLine):
     #operation should always be first element in instruction
     
-    if not firstPassThrough:
-            #make this into a dictionary later for performance
-            #check operations here
-        if instruction[0] == 'add':
+    #make this into a dictionary later for performance
+    #check operations here
+    
+    if instruction[0] == 'add':
+        if not firstPassThrough:
             binaryInstruction = add(instruction)
-        elif instruction[0] == 'sub':
+    elif instruction[0] == 'sub':
+        if not firstPassThrough:
             binaryInstruction = sub(instruction)
-        elif instruction[0] == 'addi':
+    elif instruction[0] == 'addi':
+        if not firstPassThrough:
             binaryInstruction = addi(instruction)
-        elif instruction[0] == 'and':
+    elif instruction[0] == 'and':
+        if not firstPassThrough:
             binaryInstruction = andFunc(instruction)
-        elif instruction[0] == 'or':
+    elif instruction[0] == 'or':
+        if not firstPassThrough:
             binaryInstruction = orFunc(instruction)
-        elif instruction[0] == 'xor':
+    elif instruction[0] == 'xor':
+        if not firstPassThrough:
             binaryInstruction = xor(instruction)
-        elif instruction[0] == 'nor':
+    elif instruction[0] == 'nor':
+        if not firstPassThrough:
             binaryInstruction = nor(instruction)
-        elif instruction[0] == 'beq':
-            binaryInstruction = beq(instruction)
-        elif instruction[0] == 'bne':
-            binaryInstruction = bne(instruction)
-        elif instruction[0] == 'j':
+    elif instruction[0] == 'beq':
+        if not firstPassThrough:
+            binaryInstruction = beq(instruction, currentLine)#needs to know current line
+    elif instruction[0] == 'bne':
+        if not firstPassThrough:
+            binaryInstruction = bne(instruction, currentLine)#needs to know current line
+    elif instruction[0] == 'j':
+        if not firstPassThrough:
             binaryInstruction = j(instruction)
-        elif instruction[0] == 'jal':
+    elif instruction[0] == 'jal':
+        if not firstPassThrough:
             binaryInstruction = jal(instruction)
-        elif instruction[0] == 'sll':
+    elif instruction[0] == 'sll':
+        if not firstPassThrough:
             binaryInstruction = sll(instruction)
-        elif instruction[0] == 'srl':
+    elif instruction[0] == 'srl':
+        if not firstPassThrough:
             binaryInstruction = srl(instruction)
-        elif instruction[0] == 'lw':
+    elif instruction[0] == 'lw':
+        if not firstPassThrough:
             binaryInstruction = lw(instruction)
-        elif instruction[0] == 'lb':
+    elif instruction[0] == 'lb':
+        if not firstPassThrough:
             binaryInstruction = lb(instruction)
-        elif instruction[0] == 'lh':
+    elif instruction[0] == 'lh':
+        if not firstPassThrough:
             binaryInstruction = lh(instruction)
-        elif instruction[0] == 'sw':
+    elif instruction[0] == 'sw':
+        if not firstPassThrough:
             binaryInstruction = sw(instruction)
-        elif instruction[0] == 'sb':
+    elif instruction[0] == 'sb':
+        if not firstPassThrough:
             binaryInstruction = sb(instruction)
-        elif instruction[0] == 'sh':
+    elif instruction[0] == 'sh':
+        if not firstPassThrough:
             binaryInstruction = sh(instruction)
-        elif instruction[0] == 'syscall':
+    elif instruction[0] == 'syscall':
+        if not firstPassThrough:
             binaryInstruction = syscall(instruction)
-        elif instruction[0] == 'slti':
+    elif instruction[0] == 'slti':
+        if not firstPassThrough:
             binaryInstruction = slti(instruction)
-        elif instruction[0] == 'andi':
+    elif instruction[0] == 'andi':
+        if not firstPassThrough:
             binaryInstruction = andi(instruction)
-        elif instruction[0] == 'ori':
+    elif instruction[0] == 'ori':
+        if not firstPassThrough:
             binaryInstruction = ori(instruction)
-        elif instruction[0] == 'xori':
+    elif instruction[0] == 'xori':
+        if not firstPassThrough:
             binaryInstruction = xori(instruction)
-        elif instruction[0] == 'lui':
+    elif instruction[0] == 'lui':
+        if not firstPassThrough:
             binaryInstruction = lui(instruction)
-        elif instruction[0] == 'jr':
+    elif instruction[0] == 'jr':
+        if not firstPassThrough:
             binaryInstruction = jr(instruction)
-        elif instruction[0] == 'mult':
+    elif instruction[0] == 'mult':
+        if not firstPassThrough:
             binaryInstruction = mult(instruction)
-        elif instruction[0] == 'div':
+    elif instruction[0] == 'div':
+        if not firstPassThrough:
             binaryInstruction = div(instruction)
-        
-        else:
-            if firstPassThrough:
-                print("first pass through")
-                key = instruction[0]
-                
-                #proper syntax for a label
-                if key.endswith(':') and len(key)>1:
-                    Labels[key] = currentLine
-            else:
-                if not instruction[0] in Labels:
-                    binaryInstruction = instruction[0] + " is not a valid operation"
-                else:
-                    binaryInstruction = ''#ignore current line, it is a label. set binary instruction to print nothing
+    
+    else:
+        if firstPassThrough:
+            print("first pass through")
+            key = instruction[0]
             
-        #second part of and statement prevents printing of unecessary line
-        if not firstPassThrough and not binaryInstruction == '':
-            print(binaryInstruction)
-        return
+            #proper syntax for a label
+            if key.endswith(':') and len(key)>1:
+                Labels[key] = currentLine
+        else:
+            if not instruction[0] in Labels:
+                binaryInstruction = instruction[0] + " is not a valid operation"
+            else:
+                binaryInstruction = ''#ignore current line, it is a label. set binary instruction to print nothing
+        
+    #second part of and statement prevents printing of unecessary line
+    if not firstPassThrough and not binaryInstruction == '':
+        print(binaryInstruction)
+    return
 
 #functions to handle individual instructions
 def add(instruction):
@@ -334,7 +363,7 @@ def addi(instruction):
         #opcode
         binaryInstructionList.append('001000')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, False)
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -343,7 +372,7 @@ def addi(instruction):
     return binaryInstruction
 
 
-def beq(instruction):
+def beq(instruction, currentLine):
     #wrong format for beq instruction
     if(len(instruction)!=4):
         print("incorrect format for beq instruction")
@@ -353,16 +382,18 @@ def beq(instruction):
         #opcode
         binaryInstructionList.append('000100')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, True)
         for reg in regList:
             binaryInstructionList.append(reg)
 
+        binaryInstructionList.append(findBranchLabelAddress(instruction[3], currentLine))
+        
         binaryInstruction = ''.join(binaryInstructionList)
     
     return binaryInstruction
 
 
-def bne(instruction):
+def bne(instruction, currentLine):
     #wrong format for bne instruction
     if(len(instruction)!=4):
         print("incorrect format for bne instruction")
@@ -372,9 +403,11 @@ def bne(instruction):
         #opcode
         binaryInstructionList.append('000101')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, True)
         for reg in regList:
             binaryInstructionList.append(reg)
+        
+        binaryInstructionList.append(findBranchLabelAddress(instruction[3], currentLine))
 
         binaryInstruction = ''.join(binaryInstructionList)
     
@@ -388,14 +421,7 @@ def j(instruction):
         binaryInstructionList = []
         #opcode
         binaryInstructionList.append('000010')
-        
-        binaryInstructionList.append(findLabelAddress(instruction[1]))
-        
-        #checkForNegativeAddressJump(instruction[1])
-        
-        #address = getJTypeAddress(instruction)
-        #binaryInstructionList.append(getImmediateValue(instruction[1], 26))
-        
+        binaryInstructionList.append(findJLabelAddress(instruction[1]))
         binaryInstruction = ''.join(binaryInstructionList)
         
     return binaryInstruction
@@ -408,12 +434,7 @@ def jal(instruction):
         binaryInstructionList = []
         #opcode
         binaryInstructionList.append('000011')
-        
-        checkForNegativeAddressJump(instruction[1])
-        
-        #address = getJTypeAddress(instruction)
-        binaryInstructionList.append(getImmediateValue(instruction[1], 26))
-        
+        binaryInstructionList.append(findJLabelAddress(instruction[1]))
         binaryInstruction = ''.join(binaryInstructionList)
         
     return binaryInstruction
@@ -542,7 +563,7 @@ def slti(instruction):
         #opcode
         binaryInstructionList.append('001010')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, False)
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -560,7 +581,7 @@ def andi(instruction):
         #opcode
         binaryInstructionList.append('001100')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, False)
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -578,7 +599,7 @@ def ori(instruction):
         #opcode
         binaryInstructionList.append('001101')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, False)
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -596,7 +617,7 @@ def xori(instruction):
         #opcode
         binaryInstructionList.append('001110')
         
-        regList = getITypeRegisters(instruction)
+        regList = getITypeRegisters(instruction, False)
         for reg in regList:
             binaryInstructionList.append(reg)
 
@@ -698,14 +719,15 @@ def getRTypeRegisters(instruction):
     return registersList
 
 
-def getITypeRegisters(instruction):
+def getITypeRegisters(instruction, branchInstruction):
     registersList = []
     #$rs
     registersList.append(getRegisterValue(instruction[2]))
     #$rt
     registersList.append(getRegisterValue(instruction[1]))
-    #imm
-    registersList.append(getImmediateValue(instruction[3], 16))
+    if not branchInstruction:#branch has its own 3rd parameter value method
+        #imm
+        registersList.append(getImmediateValue(instruction[3], 16))
     
     return registersList
 
@@ -824,9 +846,7 @@ def getImmediateValue(imm,numOfBits):
     elif(intImm < -(2**numOfBits)):
         print("Immediate value", imm, "too small for", numOfBits,"bits. Incorrect immediate value produced in below instruction.")
     
-    twos = lambda x, count=numOfBits: "".join(map(lambda y:str((x>>y)&1), range(count-1, -1, -1)))
-    
-    return twos(intImm)
+    return getTwosComplement(intImm,numOfBits)
 
 #returns binary for shamt
 def getBinaryShiftValue(shift):
@@ -845,9 +865,15 @@ def getBinaryShiftValue(shift):
     
     return  valueString
 
-def findLabelAddress(label):
+def findJLabelAddress(label):
     labelAddress = Labels[label]
-    return getTwosComplement(labelAddress, 26)
+    return getTwosComplement(labelAddress + startingAddress, 26)#add label to start address
+
+def findBranchLabelAddress(label, currentLine):
+    labelAddress = Labels[label]
+    difference = labelAddress - currentLine
+    return getTwosComplement(difference, 16)
+    
     
 def getTwosComplement(imm,numOfBits):
     intImm = (int(imm))
@@ -857,6 +883,7 @@ def getTwosComplement(imm,numOfBits):
 
 
 if __name__=="__main__":
-    Labels = {}
+    Labels = {}#dictionary of labels
+    startingAddress = 0#default starting memory address of program
     main()
     print(Labels)
