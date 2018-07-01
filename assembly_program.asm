@@ -6,13 +6,16 @@ Label1:
 asdf
 j Label2:
 jal Label2:
+bne $t7, $t7, Label1:
+bne $t7, $t7, Label4:
 j Label1:
 j Label1:
+Label4:
 sll $t5, $s5, 3
+
 srl $t5, $s5, 31
 srl $t5, $s5, 32
-bne $t7, $t7, Label1:
-bne $t7, $t7, Label1:
+
 add $s0, $s0, $s0
 sub $t4, $s6, $s6
 addi $s2, $s0, 256

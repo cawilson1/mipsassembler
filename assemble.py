@@ -871,7 +871,7 @@ def findJLabelAddress(label):
 
 def findBranchLabelAddress(label, currentLine):
     labelAddress = Labels[label]
-    difference = labelAddress - currentLine
+    difference = (labelAddress - currentLine)-1#for offset
     return getTwosComplement(difference, 16)
     
     
