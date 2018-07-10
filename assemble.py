@@ -129,7 +129,7 @@ def checkOperation(instruction, firstPassThrough, currentLine):
             
             #proper syntax for a label
             if key.endswith(':') and len(key)>1:
-                Labels[key] = currentLine
+                Labels[key[:-1]] = currentLine#remove the colon
         else:
             if not instruction[0] in Labels:
                 binaryInstruction = instruction[0] + " is not a valid operation"
@@ -866,11 +866,11 @@ def getBinaryShiftValue(shift):
     return  valueString
 
 def findJLabelAddress(label):
-    labelAddress = Labels[label]
+    labelAddress = Labels[label[:-1]]
     return getTwosComplement(labelAddress + startingAddress, 26)#add label to start address
 
 def findBranchLabelAddress(label, currentLine):
-    labelAddress = Labels[label]
+    labelAddress = Labels[label[:-1]]
     difference = (labelAddress - currentLine)-1#for offset
     return getTwosComplement(difference, 16)
     
