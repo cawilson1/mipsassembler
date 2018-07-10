@@ -37,6 +37,11 @@ def checkOperation(instruction, firstPassThrough, currentLine):
     #make this into a dictionary later for performance
     #check operations here
     
+   # lineIndex = 0
+    #if not firstPassThrough and instruction[0][-1] == ':' and len(instruction) == 1:
+        #this line has a label and the label is not the only instruction on the line. The next instruction begins at index 1
+        #lineIndex = 1
+    
     if instruction[0] == 'add':
         if not firstPassThrough:
             binaryInstruction = add(instruction)
@@ -866,11 +871,11 @@ def getBinaryShiftValue(shift):
     return  valueString
 
 def findJLabelAddress(label):
-    labelAddress = Labels[label[:-1]]
+    labelAddress = Labels[label]
     return getTwosComplement(labelAddress + startingAddress, 26)#add label to start address
 
 def findBranchLabelAddress(label, currentLine):
-    labelAddress = Labels[label[:-1]]
+    labelAddress = Labels[label]
     difference = (labelAddress - currentLine)-1#for offset
     return getTwosComplement(difference, 16)
     

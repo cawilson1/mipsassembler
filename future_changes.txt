@@ -1,6 +1,8 @@
 Future changes:
 
 Allow labels to be placed on the same line as another instruction as well.
+Refactor so that checkOperation function sends each instruction type funcion
+the instruction with a starting index of 0.
 
 Eventually, get incorrect syntaxes to not assemble, as they may affect the correctness of assembly. For ex. on a branch instruction, an improper label may count as a line of code and give the wrong offset. Stop assembly at exactly the point where error occurs.
 
