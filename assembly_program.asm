@@ -1,9 +1,6 @@
 Label1:
 
 
-
-
-asdf
 j Label2
 jal Label2 
 bne $t7, $t7, Label1
@@ -23,6 +20,7 @@ and $t4, $s2, $t3
 or $t5, $zero, $s7
 xor $t8, $zero, $v1
 nor $s6, $s6, $s6
+Label5: 
 bne $t7, $t7, Label2
 add $s0, $s0, $s0
 beq $s0, $t0, Label2
@@ -40,7 +38,7 @@ bne $15, $15, Label2
 bne $t7, $t7, Label1
 add $0, $zero, $0
 slti $t5, $s7, 9
-Label2: andi $a0, $a0, 15
+Label2:         andi $a0, $a0, 15
 ori $s0, $a0, 255
 xori $s0, $a0, 255
 Label3

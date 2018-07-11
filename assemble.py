@@ -25,22 +25,25 @@ def assembleInstructions(assemblyCode):
         for line in assemblyCode:
             if not line.strip() == '':#ignore blank lines
                 instruction = line.split(" ")
-                checkOperation(instruction, firstPassThrough, currentLine)
-                currentLine += 1
+                if(checkOperation(instruction, firstPassThrough, currentLine)):#if false is returned, the line consists only of a label
+                    currentLine += 1
         i += 1
         firstPassThrough = False
         currentLine = 0
     
 def checkOperation(instruction, firstPassThrough, currentLine):
-    #operation should always be first element in instruction
     
-    #make this into a dictionary later for performance
-    #check operations here
+    isInstructionLine = True #return value. true by default. If the line contains only a label, it is change to false
     
-   # lineIndex = 0
-    #if not firstPassThrough and instruction[0][-1] == ':' and len(instruction) == 1:
-        #this line has a label and the label is not the only instruction on the line. The next instruction begins at index 1
-        #lineIndex = 1
+    if not firstPassThrough and ':' in instruction[0] and len(instruction) > 1 and not instruction[1] == '': #and not instruction[0][-1] == ':':
+       #this line contains a label and an instruction. ignore label and go to instruction
+       print(instruction[0],' before')
+       if(instruction[0][-1]==':'):#The label has a space between it and the instruction
+           instruction = removeLabelFromLine(instruction)
+       else:
+           instruction = splitLabelFromInstruction(instruction)
+       print(instruction[0],' after')
+      
     
     if instruction[0] == 'add':
         if not firstPassThrough:
@@ -135,16 +138,40 @@ def checkOperation(instruction, firstPassThrough, currentLine):
             #proper syntax for a label
             if key.endswith(':') and len(key)>1:
                 Labels[key[:-1]] = currentLine#remove the colon
+                
+                if(not len(instruction) > 1 or not key == ''):
+                    print(key, ' does not increment curent line')
+                    isInstructionLine = False
         else:
-            if not instruction[0] in Labels:
-                binaryInstruction = instruction[0] + " is not a valid operation"
+            if not instruction[0][:-1] in Labels:
+                binaryInstruction = instruction[0] + " is not a valid operation. If using a label, make sure it ends with a colon."
             else:
                 binaryInstruction = ''#ignore current line, it is a label. set binary instruction to print nothing
         
     #second part of and statement prevents printing of unecessary line
     if not firstPassThrough and not binaryInstruction == '':
         print(binaryInstruction)
-    return
+    return isInstructionLine
+
+#the value at the first index is a label. Remove it and return the instruction
+def removeLabelFromLine(instruction):
+    newList = []
+    for item in instruction[1:]:
+        newList.append(item)
+        
+    return newList
+
+def splitLabelFromInstruction(instruction):
+    newList = []
+    temp = instruction[0]
+    tempList = temp.split(':')
+    print('the split:::: ',tempList[1])
+    newList.append(tempList[0])
+    newList.append(tempList[1])
+    for item in instruction[1:]:
+        newList.append(item)
+        
+    return newList
 
 #functions to handle individual instructions
 def add(instruction):
