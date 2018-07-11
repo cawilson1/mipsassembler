@@ -136,11 +136,17 @@ def checkOperation(instruction, firstPassThrough, currentLine):
             key = instruction[0]
             
             #proper syntax for a label
-            if key.endswith(':') and len(key)>1:
-                Labels[key[:-1]] = currentLine#remove the colon
+            if ':' in  key:#key.endswith(':') and len(key)>1:
+                if key[-1] == ':':
+                    Labels[key[:-1]] = currentLine#remove the colon
                 
-                if(not len(instruction) > 1 or not key == ''):
-                    print(key, ' does not increment curent line')
+                    if(not len(instruction) > 1 or not key == ''):
+                        print(key, ' does not increment current line')
+                        isInstructionLine = False
+                else:#colon of label is touching the instruction
+                    key = returnSplitKey(key)
+                    Labels[key] = currentLine
+                    print(key, ' does not increment current line')
                     isInstructionLine = False
         else:
             if not instruction[0][:-1] in Labels:
@@ -166,12 +172,16 @@ def splitLabelFromInstruction(instruction):
     temp = instruction[0]
     tempList = temp.split(':')
     print('the split:::: ',tempList[1])
-    newList.append(tempList[0])
+    #newList.append(tempList[0])
     newList.append(tempList[1])
     for item in instruction[1:]:
         newList.append(item)
         
     return newList
+
+def returnSplitKey(instruction):
+    tempList = instruction.split(':')
+    return tempList[0]
 
 #functions to handle individual instructions
 def add(instruction):

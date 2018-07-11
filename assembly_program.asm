@@ -38,7 +38,7 @@ bne $15, $15, Label2
 bne $t7, $t7, Label1
 add $0, $zero, $0
 slti $t5, $s7, 9
-Label2:         andi $a0, $a0, 15
+Label2:andi $a0, $a0, 15
 ori $s0, $a0, 255
 xori $s0, $a0, 255
 Label3
