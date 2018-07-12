@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
 def main():
     
     with open(('assembly_program.asm'), "r") as f:
             assemblyCode = f.read()
     f.closed
-    print(assemblyCode)
+    #print(assemblyCode)
     assemblyCodeSplitByLine = assemblyCode.split("\n")
     
     #whenever read from a file, split method above always creates newlines
@@ -19,138 +21,151 @@ def assembleInstructions(assemblyCode):
     
     firstPassThrough = True
     currentLine = 0
+    trueLine = 1#actual line of file
     
     i = 0
     while(i < 2):
         for line in assemblyCode:
             if not line.strip() == '':#ignore blank lines
                 instruction = line.split(" ")
-                if(checkOperation(instruction, firstPassThrough, currentLine)):#if false is returned, the line consists only of a label
+                if(checkOperation(instruction, firstPassThrough, currentLine, trueLine)):#if false is returned, the line consists only of a label
                     currentLine += 1
+            trueLine = trueLine + 1
         i += 1
         firstPassThrough = False
         currentLine = 0
+        trueLine = 1
     
-def checkOperation(instruction, firstPassThrough, currentLine):
+def checkOperation(instruction, firstPassThrough, currentLine, trueLine):
     
     isInstructionLine = True #return value. true by default. If the line contains only a label, it is change to false
     
     if not firstPassThrough and ':' in instruction[0] and len(instruction) > 1 and not instruction[1] == '': #and not instruction[0][-1] == ':':
        #this line contains a label and an instruction. ignore label and go to instruction
-       print(instruction[0],' before')
+       
        if(instruction[0][-1]==':'):#The label has a space between it and the instruction
            instruction = removeLabelFromLine(instruction)
        else:
            instruction = splitLabelFromInstruction(instruction)
-       print(instruction[0],' after')
       
+    if not firstPassThrough:
+        removeWhitespaceAfterInstruction(instruction)
+        
+    if not firstPassThrough and instruction[-1] == ':':
+        isInstructionLine = False
     
     if instruction[0] == 'add':
         if not firstPassThrough:
-            binaryInstruction = add(instruction)
+            binaryInstruction = add(instruction, trueLine)
     elif instruction[0] == 'sub':
         if not firstPassThrough:
-            binaryInstruction = sub(instruction)
+            binaryInstruction = sub(instruction, trueLine)
     elif instruction[0] == 'addi':
         if not firstPassThrough:
-            binaryInstruction = addi(instruction)
+            binaryInstruction = addi(instruction, trueLine)
     elif instruction[0] == 'and':
         if not firstPassThrough:
-            binaryInstruction = andFunc(instruction)
+            binaryInstruction = andFunc(instruction, trueLine)
     elif instruction[0] == 'or':
         if not firstPassThrough:
-            binaryInstruction = orFunc(instruction)
+            binaryInstruction = orFunc(instruction, trueLine)
     elif instruction[0] == 'xor':
         if not firstPassThrough:
-            binaryInstruction = xor(instruction)
+            binaryInstruction = xor(instruction, trueLine)
     elif instruction[0] == 'nor':
         if not firstPassThrough:
-            binaryInstruction = nor(instruction)
+            binaryInstruction = nor(instruction, trueLine)
     elif instruction[0] == 'beq':
         if not firstPassThrough:
-            binaryInstruction = beq(instruction, currentLine)#needs to know current line
+            binaryInstruction = beq(instruction, currentLine, trueLine)#needs to know current line
     elif instruction[0] == 'bne':
         if not firstPassThrough:
-            binaryInstruction = bne(instruction, currentLine)#needs to know current line
+            binaryInstruction = bne(instruction, currentLine, trueLine)#needs to know current line
     elif instruction[0] == 'j':
         if not firstPassThrough:
-            binaryInstruction = j(instruction)
+            binaryInstruction = j(instruction, trueLine)
     elif instruction[0] == 'jal':
         if not firstPassThrough:
-            binaryInstruction = jal(instruction)
+            binaryInstruction = jal(instruction, trueLine)
     elif instruction[0] == 'sll':
         if not firstPassThrough:
-            binaryInstruction = sll(instruction)
+            binaryInstruction = sll(instruction, trueLine)
     elif instruction[0] == 'srl':
         if not firstPassThrough:
-            binaryInstruction = srl(instruction)
+            binaryInstruction = srl(instruction, trueLine)
     elif instruction[0] == 'lw':
         if not firstPassThrough:
-            binaryInstruction = lw(instruction)
+            binaryInstruction = lw(instruction, trueLine)
     elif instruction[0] == 'lb':
         if not firstPassThrough:
-            binaryInstruction = lb(instruction)
+            binaryInstruction = lb(instruction, trueLine)
     elif instruction[0] == 'lh':
         if not firstPassThrough:
-            binaryInstruction = lh(instruction)
+            binaryInstruction = lh(instruction, trueLine)
     elif instruction[0] == 'sw':
         if not firstPassThrough:
-            binaryInstruction = sw(instruction)
+            binaryInstruction = sw(instruction, trueLine)
     elif instruction[0] == 'sb':
         if not firstPassThrough:
-            binaryInstruction = sb(instruction)
+            binaryInstruction = sb(instruction, trueLine)
     elif instruction[0] == 'sh':
         if not firstPassThrough:
-            binaryInstruction = sh(instruction)
+            binaryInstruction = sh(instruction, trueLine)
     elif instruction[0] == 'syscall':
         if not firstPassThrough:
-            binaryInstruction = syscall(instruction)
+            binaryInstruction = syscall(instruction, trueLine)
     elif instruction[0] == 'slti':
         if not firstPassThrough:
-            binaryInstruction = slti(instruction)
+            binaryInstruction = slti(instruction, trueLine)
     elif instruction[0] == 'andi':
         if not firstPassThrough:
-            binaryInstruction = andi(instruction)
+            binaryInstruction = andi(instruction, trueLine)
     elif instruction[0] == 'ori':
         if not firstPassThrough:
-            binaryInstruction = ori(instruction)
+            binaryInstruction = ori(instruction, trueLine)
     elif instruction[0] == 'xori':
         if not firstPassThrough:
-            binaryInstruction = xori(instruction)
+            binaryInstruction = xori(instruction, trueLine)
     elif instruction[0] == 'lui':
         if not firstPassThrough:
-            binaryInstruction = lui(instruction)
+            binaryInstruction = lui(instruction, trueLine)
     elif instruction[0] == 'jr':
         if not firstPassThrough:
-            binaryInstruction = jr(instruction)
+            binaryInstruction = jr(instruction, trueLine)
     elif instruction[0] == 'mult':
         if not firstPassThrough:
-            binaryInstruction = mult(instruction)
+            binaryInstruction = mult(instruction, trueLine)
     elif instruction[0] == 'div':
         if not firstPassThrough:
-            binaryInstruction = div(instruction)
+            binaryInstruction = div(instruction, trueLine)
     
     else:
+        key = instruction[0]
         if firstPassThrough:
-            print("first pass through")
-            key = instruction[0]
             
             #proper syntax for a label
-            if ':' in  key:#key.endswith(':') and len(key)>1:
+            if ':' in  key:
                 if key[-1] == ':':
                     Labels[key[:-1]] = currentLine#remove the colon
                 
                     if(not len(instruction) > 1 or not key == ''):
-                        print(key, ' does not increment current line')
                         isInstructionLine = False
                 else:#colon of label is touching the instruction
                     key = returnSplitKey(key)
                     Labels[key] = currentLine
-                    print(key, ' does not increment current line')
-                    isInstructionLine = False
+                    #isInstructionLine = False
         else:
+            if ':' in  key:
+                if key[-1] == ':':
+                
+                    if(not len(instruction) > 1 or not key == ''):
+                        isInstructionLine = False
+                else:#colon of label is touching the instruction
+                    key = returnSplitKey(key)
+                    #isInstructionLine = True
             if not instruction[0][:-1] in Labels:
                 binaryInstruction = instruction[0] + " is not a valid operation. If using a label, make sure it ends with a colon."
+                sys.exit(instruction[0] + " is not a valid operation. If using a label, make sure it ends with a colon. Line:" + str(trueLine))
             else:
                 binaryInstruction = ''#ignore current line, it is a label. set binary instruction to print nothing
         
@@ -171,8 +186,6 @@ def splitLabelFromInstruction(instruction):
     newList = []
     temp = instruction[0]
     tempList = temp.split(':')
-    print('the split:::: ',tempList[1])
-    #newList.append(tempList[0])
     newList.append(tempList[1])
     for item in instruction[1:]:
         newList.append(item)
@@ -183,11 +196,17 @@ def returnSplitKey(instruction):
     tempList = instruction.split(':')
     return tempList[0]
 
+def removeWhitespaceAfterInstruction(instruction):
+    if instruction[-1] == '':#ignore whitespace after instruction
+        del instruction[-1]
+        removeWhitespaceAfterInstruction(instruction)#recursive call for arbitrary number of whitespaces
+    
+
 #functions to handle individual instructions
-def add(instruction):
+def add(instruction, trueLine):
     #wrong format for add instruction
     if(len(instruction)!=4):
-        print("incorrect format for add instruction")
+        sys.exit("incorrect format for add instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -209,10 +228,10 @@ def add(instruction):
     return binaryInstruction
     
     
-def sub(instruction):
+def sub(instruction, trueLine):
     #wrong format for sub instruction
     if(len(instruction)!=4):
-        print("incorrect format for sub instruction")
+        sys.exit("incorrect format for sub instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -233,10 +252,10 @@ def sub(instruction):
     
     return binaryInstruction
     
-def andFunc(instruction):
+def andFunc(instruction, trueLine):
     #wrong format for and instruction
     if(len(instruction)!=4):
-        print("incorrect format for and instruction")
+        sys.exit("incorrect format for and instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -257,10 +276,10 @@ def andFunc(instruction):
     
     return binaryInstruction
 
-def orFunc(instruction):
+def orFunc(instruction, trueLine):
     #wrong format for or instruction
     if(len(instruction)!=4):
-        print("incorrect format for or instruction")
+        sys.exit("incorrect format for or instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -281,10 +300,10 @@ def orFunc(instruction):
     
     return binaryInstruction
     
-def xor(instruction):
+def xor(instruction, trueLine):
     #wrong format for xor instruction
     if(len(instruction)!=4):
-        print("incorrect format for xor instruction")
+        sys.exit("incorrect format for xor instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -305,10 +324,10 @@ def xor(instruction):
     
     return binaryInstruction
     
-def nor(instruction):
+def nor(instruction, trueLine):
     #wrong format for nor instruction
     if(len(instruction)!=4):
-        print("incorrect format for nor instruction")
+        sys.exit("incorrect format for nor instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -329,10 +348,10 @@ def nor(instruction):
     
     return binaryInstruction
 
-def slt(instruction):
+def slt(instruction, trueLine):
     #wrong format for slt instruction
     if(len(instruction)!=4):
-        print("incorrect format for slt instruction")
+        sys.exit("incorrect format for slt instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -354,9 +373,9 @@ def slt(instruction):
     return binaryInstruction
     
 
-def sll(instruction):
+def sll(instruction, trueLine):
     if(len(instruction)!=4):
-        print("incorrect format for sll instruction")
+        sys.exit("incorrect format for sll instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -374,9 +393,9 @@ def sll(instruction):
         
     return binaryInstruction
 
-def srl(instruction):
+def srl(instruction, trueLine):
     if(len(instruction)!=4):
-        print("incorrect format for sll instruction")
+        sys.exit("incorrect format for sll instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -395,10 +414,10 @@ def srl(instruction):
     return binaryInstruction
         
 
-def addi(instruction):
+def addi(instruction, trueLine):
     #wrong format for addi instruction
     if(len(instruction)!=4):
-        print("incorrect format for addi instruction")
+        sys.exit("incorrect format for addi instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -414,10 +433,10 @@ def addi(instruction):
     return binaryInstruction
 
 
-def beq(instruction, currentLine):
+def beq(instruction, currentLine, trueLine):
     #wrong format for beq instruction
     if(len(instruction)!=4):
-        print("incorrect format for beq instruction")
+        sys.exit("incorrect format for beq instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -435,10 +454,10 @@ def beq(instruction, currentLine):
     return binaryInstruction
 
 
-def bne(instruction, currentLine):
+def bne(instruction, currentLine, trueLine):
     #wrong format for bne instruction
     if(len(instruction)!=4):
-        print("incorrect format for bne instruction")
+        sys.exit("incorrect format for bne instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -455,9 +474,9 @@ def bne(instruction, currentLine):
     
     return binaryInstruction
 
-def j(instruction):
+def j(instruction, trueLine):
     if(len(instruction)!=2):
-        print("incorrect format for j instruction")
+        sys.exit("incorrect format for j instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -468,9 +487,9 @@ def j(instruction):
         
     return binaryInstruction
 
-def jal(instruction):
+def jal(instruction, trueLine):
     if(len(instruction)!=2):
-        print("incorrect format for j instruction")
+        sys.exit("incorrect format for jal instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -485,9 +504,9 @@ def checkForNegativeAddressJump(address):
     if(int(address) < 0):
         print("The instruction below requests a jump to a negative address")
 
-def lw(instruction):
+def lw(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for lw instruction")
+        sys.exit("incorrect format for lw instruction line " +str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -502,9 +521,9 @@ def lw(instruction):
         
     return binaryInstruction
 
-def lb(instruction):
+def lb(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for lb instruction")
+        sys.exit("incorrect format for lb instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -519,9 +538,9 @@ def lb(instruction):
         
     return binaryInstruction
 
-def lh(instruction):
+def lh(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for lh instruction")
+        sys.exit("incorrect format for lh instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -536,9 +555,9 @@ def lh(instruction):
         
     return binaryInstruction
 
-def sw(instruction):
+def sw(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for sw instruction")
+        sys.exit("incorrect format for sw instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -553,9 +572,9 @@ def sw(instruction):
         
     return binaryInstruction
 
-def sb(instruction):
+def sb(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for sb instruction")
+        sys.exit("incorrect format for sb instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -570,9 +589,9 @@ def sb(instruction):
         
     return binaryInstruction
 
-def sh(instruction):
+def sh(instruction, trueLine):
     if(len(instruction)!=3):
-        print("incorrect format for sh instruction")
+        sys.exit("incorrect format for sh instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -587,18 +606,18 @@ def sh(instruction):
         
     return binaryInstruction
 
-def syscall(instruction):
+def syscall(instruction, trueLine):
     if(len(instruction)!=1):
-        print("incorrect format for syscall")
+        sys.exit("incorrect format for syscall line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstruction = '000000xxxxxxxxxxxxxxxxxxxx001100'
     return binaryInstruction
 
-def slti(instruction):
+def slti(instruction, trueLine):
     #wrong format for slti instruction
     if(len(instruction)!=4):
-        print("incorrect format for slti instruction")
+        sys.exit("incorrect format for slti instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -613,10 +632,10 @@ def slti(instruction):
     
     return binaryInstruction
     
-def andi(instruction):
+def andi(instruction, trueLine):
     #wrong format for andi instruction
     if(len(instruction)!=4):
-        print("incorrect format for andi instruction")
+        sys.exit("incorrect format for andi instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -631,10 +650,10 @@ def andi(instruction):
     
     return binaryInstruction
 
-def ori(instruction):
+def ori(instruction, trueLine):
     #wrong format for ori instruction
     if(len(instruction)!=4):
-        print("incorrect format for ori instruction")
+        sys.exit("incorrect format for ori instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -649,10 +668,10 @@ def ori(instruction):
     
     return binaryInstruction
 
-def xori(instruction):
+def xori(instruction, trueLine):
     #wrong format for xori instruction
     if(len(instruction)!=4):
-        print("incorrect format for xori instruction")
+        sys.exit("incorrect format for xori instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -667,10 +686,10 @@ def xori(instruction):
     
     return binaryInstruction
 
-def lui(instruction):
+def lui(instruction, trueLine):
     #wrong format for lui instruction
     if(len(instruction)!=3):
-        print("incorrect format for lui instruction")
+        sys.exit("incorrect format for lui instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -687,10 +706,10 @@ def lui(instruction):
     
     return binaryInstruction
 
-def jr(instruction):
+def jr(instruction, trueLine):
     #wrong format for jr instruction
     if(len(instruction)!=2):
-        print("incorrect format for jr instruction")
+        sys.exit("incorrect format for jr instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -706,10 +725,10 @@ def jr(instruction):
     
     return binaryInstruction
 
-def mult(instruction):
+def mult(instruction, trueLine):
     #wrong format for mult instruction
     if(len(instruction)!=3):
-        print("incorrect format for mult instruction")
+        sys.exit("incorrect format for mult instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -728,10 +747,10 @@ def mult(instruction):
     
     return binaryInstruction
 
-def div(instruction):
+def div(instruction, trueLine):
     #wrong format for div instruction
     if(len(instruction)!=3):
-        print("incorrect format for div instruction")
+        sys.exit("incorrect format for div instruction line " + str(trueLine))
         binaryInstruction = None
     else:
         binaryInstructionList = []
@@ -913,7 +932,9 @@ def findJLabelAddress(label):
 
 def findBranchLabelAddress(label, currentLine):
     labelAddress = Labels[label]
-    difference = (labelAddress - currentLine)-1#for offset
+    difference = (labelAddress - currentLine)
+    if difference <= 0:
+        difference = difference - 1
     return getTwosComplement(difference, 16)
     
     

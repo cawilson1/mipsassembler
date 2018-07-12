@@ -2,7 +2,6 @@ Future changes:
 
 Allow the use of "#" for comments
 
-Eventually, get incorrect syntaxes to not assemble, as they may affect the correctness of assembly. For ex. on a branch instruction, an improper label may count as a line of code and give the wrong offset. Stop assembly at exactly the point where error occurs.
 
 Allow for output in hex as well.
 
